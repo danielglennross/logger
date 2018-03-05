@@ -1,39 +1,27 @@
 // tslint:disable:no-empty
 
-import { Level, Adapter, adapters, Adapters } from './types';
+import { Level, IProvider, Winston, Bunyan } from './types';
 import { ISink } from './sinks';
 import { IMasker } from './masks';
 
-import { IAdapter } from './adapters/types';
+import { IAdapter, IAdapterLogger } from './adapters/types';
 import { winstonAdapter } from './adapters/winston';
+import { bunyanAdapter } from './adapters/bunyan';
 
-type Cache<Key extends Adapter> = {[K in Key]: IAdapter};
-const adapterCache = <Cache<Adapter>>{
-  [adapters.winston]: winstonAdapter,
-};
+const adapterCache: { [id: string]: IAdapter } = {};
+adapterCache[Winston.name] = winstonAdapter;
+adapterCache[Bunyan.name] = bunyanAdapter;
 
-function newAdapter(options: IConfig): any {
-  const adapterType = options.adapter || adapters.winston;
-  const adapter = adapterCache[adapterType];
-
-  const sinks = (options.sinks || []).map(s => {
-    return s.match({
-      ConsoleSink: adapter.newConsoleSink,
-      FileSink: adapter.newFileSink,
-    });
-  });
-
-  const maskers = (options.maskers || []).map(
-    adapter.newMasker,
-  );
-
-  return adapter.newLogger(sinks, maskers);
+function newAdapter(options: IConfig): IAdapterLogger {
+  const { adapter, sinks, maskers } = options;
+  const factory = adapterCache[adapter.constructor.name];
+  return factory.newLogger(adapter, sinks, maskers);
 }
 
 export interface IConfig {
+  adapter: IProvider;
   sinks: ISink[];
   maskers?: IMasker[];
-  adapter?: Adapter;
 }
 
 export interface ILogger {
@@ -45,7 +33,7 @@ export interface ILogger {
 }
 
 export class Logger implements ILogger {
-  private _logger: any;
+  private _logger: IAdapterLogger;
 
   constructor(private options: IConfig) {
     this._logger = newAdapter(options);

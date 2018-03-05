@@ -12,6 +12,10 @@ export function testTransport(winstonTransport: string, sink: myLogger.ISink) {
 
     before(() => {
       const config: myLogger.IConfig = {
+        adapter: myLogger.winston({
+          serializeConsole: JSON.stringify,
+          serializeFile: JSON.stringify,
+        }),
         sinks: [sink],
       };
 

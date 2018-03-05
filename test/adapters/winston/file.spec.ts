@@ -3,8 +3,8 @@ import { testTransport } from './sink';
 
 const sink = myLogger.newFileSink({
   level: myLogger.levels.debug,
-  formatter: function consoleFormatter(object: myLogger.ILogEvent): string {
-    return JSON.stringify(object);
+  formatter: function consoleFormatter(object: any): any {
+    return object;
   },
   filename: './test.log',
 });

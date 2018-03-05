@@ -1,19 +1,24 @@
 import * as myLogger from './index';
 
-function consoleFormatter(object: myLogger.ILogEvent, consoleConfig: myLogger.IConsoleFormatterConfig): string {
-  return consoleConfig.colorize(
-    object.level, `${object.timestamp()} ${object.level}: ${object.message || ''}`,
-  );
+// TODO make these strongle typed
+function consoleFormatter(object: any): any {
+  // return consoleConfig.colorize(
+  //   object.level, `${object.timestamp()} ${object.level}: ${object.message || ''}`,
+  // );
+  return object;
 }
 
-function fileFormatter(object: myLogger.ILogEvent): string {
-  return JSON.stringify(object);
+function fileFormatter(object: any): any {
+  return object;
 }
 
 const cases = myLogger.cases;
 
 const config: myLogger.IConfig = {
-  adapter: myLogger.adapters.winston,
+  adapter: myLogger.winston({
+    serializeConsole: JSON.stringify,
+    serializeFile: JSON.stringify,
+  }),
   sinks: [
     myLogger.newFileSink(<myLogger.IFileSinkConfig>{
       level: myLogger.levels.debug,

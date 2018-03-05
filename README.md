@@ -1,27 +1,25 @@
 A node js provider agnostic logging lib.
 
-Currently winston is supported.
+Currently Winston & Bunyan are supported.
 
 ```ts
 import * as myLogger from './index';
 
 // custom log event formatters
-function consoleFormatter(object: myLogger.ILogEvent, config: myLogger.IConsoleFormatterConfig): string {
-  return config.colorize(
-    object.level, `${object.timestamp()} ${object.level}: ${object.message || ''}`,
-  );
+function consoleFormatter(object: any): string {
+  return object;
 }
 
-function fileFormatter(object: myLogger.ILogEvent): string {
-  return JSON.stringify(object);
+function fileFormatter(object: any): any {
+  return object;
 }
 
 const cases = myLogger.cases;
 
 // configure logger
 
-// Adapters: (optional, default: winston)
-// only one adapter is currently supported - winston
+// Adapters: (required)
+// select adapter and configure adapter specific options
 
 // Sinks: (required)
 // use exported interfaces/types ISink, IFileSink, Formatter, Level to create custom imps
@@ -31,7 +29,10 @@ const cases = myLogger.cases;
 // use exported interfaces/types IMasker, Scrubber to create custom imps
 // or factories for pre-built maskers
 const config: myLogger.IConfig = {
-  adapter: myLogger.adapters.winston,
+  adapter: myLogger.winston({
+    serializeConsole: JSON.stringify,
+    serializeFile: JSON.stringify,
+  }),
   sinks: [
     myLogger.newFileSink(<myLogger.IFileSinkConfig>{
       level: myLogger.levels.debug,

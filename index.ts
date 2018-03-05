@@ -11,8 +11,10 @@ import {
 
 // types
 export {
-  Adapter,
-  adapters,
+  winston,
+  bunyan,
+  IWinstonConfig,
+  IBunyanConfig,
   Level,
   levels,
   Case,
@@ -21,12 +23,9 @@ export {
 
 export { ISink,
   IFileSink,
-  ILogEvent,
   Formatter,
   ISinkConfig,
   IFileSinkConfig,
-  IFormatterConfig,
-  IConsoleFormatterConfig,
   newConsoleSink,
   newFileSink,
 } from './src/sinks';

@@ -8,7 +8,7 @@ interface IFieldMaskerConfig {
   mask: string;
 }
 
-export type Scrubber = <T>(level: Level, message: string, object: T) => T;
+export type Scrubber = <T>(object: T) => T;
 
 export interface IMasker {
   scrubber: Scrubber;
@@ -17,10 +17,10 @@ export interface IMasker {
 class TargetFieldsMasker implements IMasker {
   constructor(private targetPaths: string|string[], private masker: IMasker) { }
 
-  public scrubber<T>(level: Level, message: string, object: T): T {
+  public scrubber<T>(object: T): T {
     [].concat(this.targetPaths).forEach((path) => {
       const target = getObjectPath(object, path);
-      this.masker.scrubber<T>(level, message, target);
+      this.masker.scrubber<T>(target);
     });
     return object;
   }
@@ -29,9 +29,9 @@ class TargetFieldsMasker implements IMasker {
 class RuleFieldsMasker implements IMasker {
   constructor(private rule: (object: any) => boolean, private masker: IMasker) { }
 
-  public scrubber<T>(level: Level, message: string, object: T): T {
+  public scrubber<T>(object: T): T {
     if (this.rule(object)) {
-      return this.masker.scrubber<T>(level, message, object);
+      return this.masker.scrubber<T>(object);
     }
     return object;
   }
@@ -47,7 +47,7 @@ class RecursiveFieldsMasker implements IMasker {
     this.keySelector[cases.pascal] = f.pascalCase;
   }
 
-  public scrubber<T>(level: Level, message: string, object: T): T {
+  public scrubber<T>(object: T): T {
     const { case: fieldCase, field: fieldList, mask } = this.fieldSelector;
 
     // get all relevant case functions

@@ -1,24 +1,11 @@
 import { Level } from './types';
 
-export interface ILogEvent {
-  level: Level;
-  message: string;
-  meta: any;
-  timestamp(): string;
-}
-
-export interface IFormatterConfig {}
-export interface IConsoleFormatterConfig extends IFormatterConfig {
-  colorize: (level: Level, msg: string) => string;
-}
-
-export type Formatter = (object: ILogEvent, config?: IFormatterConfig) => string;
+export type Formatter = (object: any) => any;
 
 export interface ISink {
   level: Level;
   formatter: Formatter;
   match(pattern: IConfigPattern): any;
-  timestamp(): string;
 }
 
 export interface IFileSink extends ISink {
@@ -33,15 +20,11 @@ export interface IConfigPattern {
 export abstract class BaseSinkConfig  {
   constructor(public level: Level, public formatter: Formatter) {}
 
-  public timestamp(): string {
-    return new Date().toISOString();
-  }
-
   public abstract match(p: IConfigPattern): any;
 }
 
 export class ConsoleSink extends BaseSinkConfig implements ISink {
-  constructor(level: Level, public formatter: Formatter, public colorize?: boolean) {
+  constructor(level: Level, public formatter: Formatter) {
     super(level, formatter);
   }
 
@@ -62,20 +45,16 @@ export class FileSink extends BaseSinkConfig implements IFileSink {
 
 export interface ISinkConfig {
   level: Level;
-  formatter: Formatter;
-}
-
-export interface IConsoleSinkConfig extends ISinkConfig {
-  colorize?: boolean;
+  formatter?: Formatter;
 }
 
 export interface IFileSinkConfig extends ISinkConfig {
   filename: string;
 }
 
-export function newConsoleSink(options: IConsoleSinkConfig) {
-  const { level, formatter, colorize = false } = options;
-  return new ConsoleSink(level, formatter, colorize);
+export function newConsoleSink(options: ISinkConfig) {
+  const { level, formatter = (obj: any) => obj } = options;
+  return new ConsoleSink(level, formatter);
 }
 
 export function newFileSink(options: IFileSinkConfig) {

@@ -1,12 +1,31 @@
-export type Adapter = 'winston';
+export interface IProvider {}
+export interface IWinstonProvider extends IProvider {
+  serializeConsole: (obj: any) => string;
+  serializeFile: (obj: any) => string;
+}
 
-export type Adapters = {
-  winston: Adapter,
-};
+export interface IWinstonConfig {
+  serializeConsole: (obj: any) => string;
+  serializeFile: (obj: any) => string;
+}
 
-export const adapters: Adapters = {
-  winston: 'winston',
-};
+export class Winston implements IWinstonProvider {
+  constructor(public serializeConsole: (obj: any) => string, public serializeFile: (obj: any) => string) { }
+}
+
+export interface IBunyanConfig {
+}
+
+export class Bunyan implements IProvider {
+}
+
+export function winston(config: IWinstonConfig): IProvider {
+  return new Winston(config.serializeConsole, config.serializeFile);
+}
+
+export function bunyan(config: IBunyanConfig): IProvider {
+  return new Bunyan();
+}
 
 export type Level = 'verbose' | 'debug' | 'info' | 'warn' | 'error';
 
@@ -14,6 +33,7 @@ export type Levels = {
   verbose: Level,
   debug: Level,
   info: Level,
+  warn: Level,
   error: Level,
 };
 
@@ -21,6 +41,7 @@ export const levels: Levels = {
   verbose: 'verbose',
   debug: 'debug',
   info: 'info',
+  warn: 'warn',
   error: 'error',
 };
 

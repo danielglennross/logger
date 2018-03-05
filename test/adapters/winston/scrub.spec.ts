@@ -31,11 +31,15 @@ describe(`Recursive masker`, () => {
 
   it('should recursively mask object', () => {
     const config: myLogger.IConfig = {
+      adapter: myLogger.winston({
+        serializeConsole: JSON.stringify,
+        serializeFile: JSON.stringify,
+      }),
       sinks: [
         myLogger.newConsoleSink({
           level: myLogger.levels.debug,
-          formatter: function consoleFormatter(object: myLogger.ILogEvent): string {
-            return JSON.stringify(object);
+          formatter: function consoleFormatter(object: any): any {
+            return object;
           },
         }),
       ],
@@ -67,11 +71,15 @@ describe(`Recursive masker`, () => {
     const { desc, logMeta, assert } = testData;
     it(`should recursively mask ${desc}`, () => {
       const config: myLogger.IConfig = {
+        adapter: myLogger.winston({
+          serializeConsole: JSON.stringify,
+          serializeFile: JSON.stringify,
+        }),
         sinks: [
           myLogger.newConsoleSink({
             level: myLogger.levels.debug,
-            formatter: function consoleFormatter(object: myLogger.ILogEvent): string {
-              return JSON.stringify(object);
+            formatter: function consoleFormatter(object: any): any {
+              return object;
             },
           }),
         ],
@@ -151,11 +159,15 @@ describe(`Recursive masker`, () => {
 
     it(`should recursively mask: ${desc}`, () => {
       const config: myLogger.IConfig = {
+        adapter: myLogger.winston({
+          serializeConsole: JSON.stringify,
+          serializeFile: JSON.stringify,
+        }),
         sinks: [
           myLogger.newConsoleSink({
             level: myLogger.levels.debug,
-            formatter: function consoleFormatter(object: myLogger.ILogEvent): string {
-              return JSON.stringify(object);
+            formatter: function consoleFormatter(object: any): any {
+              return object;
             },
           }),
         ],
